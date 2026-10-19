@@ -50,10 +50,8 @@
         -->
       </div>
     </div>
-    <!-- Foto: pane pilt kausta img/ nimega roger.jpg, see ilmub ise. -->
-    <figure class="photo">
-      <img src="img/roger.jpg" alt="Roger-Romeo Arm" width="800" height="1000"
-           onload="this.parentElement.classList.add('has-img')" onerror="this.remove()">
+    <!-- Foto: lae pilt kausta img/profiil (failinimi ei loe), see ilmub ise. -->
+    <figure class="photo" data-folder="profiil">
       <div class="ph" aria-hidden="true">RA</div>
       <figcaption><span>Roger-Romeo Arm</span><span>Tartu</span></figcaption>
     </figure>
@@ -520,15 +518,15 @@
 
       <div class="builds">
         <!--
+          PILDID: lae fotod kausta img/ehitused/<data-folder>, näiteks img/ehitused/pohiarvuti.
+          Piltide arv ei ole piiratud, järjekord on failinimede järgi (01, 02, ...).
           UUE EHITUSE LISAMINE: kopeeri üks <article class="build">...</article> plokk,
-          pane pilt kausta img/ehitused/ ja muuda src, pealkiri ja osad.
+          muuda data-folder uue kausta nimeks ning pealkiri ja osad.
         -->
         <article class="build">
-          <div class="pic">
+          <div class="gallery" data-folder="pohiarvuti" data-alt="Põhiarvuti">
             <span class="badge ok">Minu arvuti</span>
-            <img src="img/ehitused/pohiarvuti.jpg" alt="Roger-Romeo põhiarvuti" loading="lazy"
-                 onload="this.parentElement.classList.add('has-img')" onerror="this.remove()">
-            <div class="ph">Foto tulekul</div>
+            <div class="ph">Pildid tulekul</div>
           </div>
           <div class="body">
             <h3>Põhiarvuti</h3>
@@ -544,11 +542,9 @@
         </article>
 
         <article class="build">
-          <div class="pic">
+          <div class="gallery" data-folder="mitx" data-alt="Mini-ITX mänguarvuti">
             <span class="badge">Müügiks</span>
-            <img src="img/ehitused/mitx.jpg" alt="Mini-ITX arvuti Fractal Define 7 Nano korpuses" loading="lazy"
-                 onload="this.parentElement.classList.add('has-img')" onerror="this.remove()">
-            <div class="ph">Foto tulekul</div>
+            <div class="ph">Pildid tulekul</div>
           </div>
           <div class="body">
             <h3>Mini-ITX mänguarvuti</h3>
@@ -686,8 +682,12 @@
 </footer>
 
 <dialog class="lb" id="lb" aria-label="Pildi suurendus">
-  <img src="" alt="">
-  <div class="bar"><span class="cap"></span><button type="button" value="close">Sulge [Esc]</button></div>
+  <div class="stage">
+    <img src="" alt="">
+    <button type="button" class="lb-nav prev" aria-label="Eelmine pilt">&lsaquo;</button>
+    <button type="button" class="lb-nav next" aria-label="Järgmine pilt">&rsaquo;</button>
+  </div>
+  <div class="bar"><span class="cap"></span><span class="ctr"></span><button type="button" class="close">Sulge [Esc]</button></div>
 </dialog>
 
 <script src="main.js"></script>
