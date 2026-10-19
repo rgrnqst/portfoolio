@@ -178,7 +178,8 @@ a { color: inherit; }
   background: var(--bg); border: var(--b) solid var(--line-2); padding: 7px 10px; color: var(--muted);
 }
 
-@media (max-width: 860px) {
+.hero .lead { hyphens: auto; overflow-wrap: break-word; }
+@media (max-width: 1020px) {
   .hero .wrap { grid-template-columns: 1fr; }
   .photo { justify-self: start; max-width: 320px; }
 }
