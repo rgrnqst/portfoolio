@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Ehitab lehe kausta _site.
 
-Kopeerib lehe failid ja töötleb fotod kaustadest img/ehitused/<ehitus>/ ja img/profiil/:
+Kopeerib lehe failid ja töötleb fotod kaustadest img/ehitused/<ehitus>/, img/profiil/ ja img/kaas/:
 pöörab õiget pidi, vähendab suuruse, teeb eelvaated ja eemaldab metaandmed (sh asukoha).
 Piltide nimekiri kirjutatakse faili _site/img/pildid.json, mille järgi leht galeriid näitab.
 """
@@ -24,7 +24,6 @@ OUT = ROOT / "_site"
 EXT = {".jpg", ".jpeg", ".png", ".webp", ".heic", ".heif", ".avif", ".gif", ".bmp", ".tif", ".tiff"}
 FULL = 1800   # suurenduse pikem külg (px)
 THUMB = 900   # eelvaate pikem külg (px)
-BG = (29, 30, 27)
 
 
 def natural_key(s):
@@ -50,17 +49,37 @@ def caption(stem):
     return s[:1].upper() + s[1:]
 
 
-def to_rgb(im):
-    if im.mode in ("RGBA", "LA") or (im.mode == "P" and "transparency" in im.info):
+def has_alpha(im):
+    return im.mode in ("RGBA", "LA", "PA") or (im.mode == "P" and "transparency" in im.info)
+
+
+def normalize(im):
+    """Läbipaistvusega pilt (nt eemaldatud taustaga) jääb RGBA-ks, muu teisendatakse RGB-ks."""
+    if has_alpha(im):
         im = im.convert("RGBA")
-        bg = Image.new("RGB", im.size, BG)
-        bg.paste(im, mask=im.split()[-1])
-        return bg
-    return im.convert("RGB")
+        if im.getextrema()[3][0] < 255:
+            return im, True
+    return im.convert("RGB"), False
+
+
+def read_captions(src_dir):
+    """Valikuline fail allkirjad.txt: igal real "failinimi = pildiallkiri"."""
+    caps = {}
+    f = src_dir / "allkirjad.txt"
+    if f.is_file():
+        for line in f.read_text(encoding="utf-8").splitlines():
+            if "=" in line and not line.lstrip().startswith("#"):
+                k, v = line.split("=", 1)
+                k = k.strip()
+                caps[k] = v.strip()
+                caps[Path(k).stem] = v.strip()
+    return caps
 
 
 def process_dir(src_dir, out_dir):
     items, used = [], set()
+    caps = read_captions(src_dir)
+    (out_dir / "allkirjad.txt").unlink(missing_ok=True)
     files = sorted(
         (p for p in src_dir.iterdir() if p.is_file() and p.suffix.lower() in EXT),
         key=lambda p: natural_key(p.name),
@@ -71,7 +90,7 @@ def process_dir(src_dir, out_dir):
         try:
             with Image.open(f) as im0:
                 icc = im0.info.get("icc_profile")
-                im = to_rgb(ImageOps.exif_transpose(im0))
+                im, alpha = normalize(ImageOps.exif_transpose(im0))
         except Exception as e:
             print(f"::warning file={rel}::Pilti ei saanud avada: {e}")
             continue
@@ -84,20 +103,27 @@ def process_dir(src_dir, out_dir):
 
         full = im.copy()
         full.thumbnail((FULL, FULL), Image.LANCZOS)
-        full.save(out_dir / f"{name}.jpg", "JPEG", quality=82, optimize=True, progressive=True, icc_profile=icc)
         th = im.copy()
         th.thumbnail((THUMB, THUMB), Image.LANCZOS)
-        th.save(out_dir / f"{name}.t.jpg", "JPEG", quality=76, optimize=True, progressive=True, icc_profile=icc)
+        if alpha:  # läbipaistev taust säilib WebP-na
+            ext = "webp"
+            full.save(out_dir / f"{name}.webp", "WEBP", quality=86, method=6, icc_profile=icc)
+            th.save(out_dir / f"{name}.t.webp", "WEBP", quality=80, method=6, icc_profile=icc)
+        else:
+            ext = "jpg"
+            full.save(out_dir / f"{name}.jpg", "JPEG", quality=82, optimize=True, progressive=True, icc_profile=icc)
+            th.save(out_dir / f"{name}.t.jpg", "JPEG", quality=76, optimize=True, progressive=True, icc_profile=icc)
 
         web = out_dir.relative_to(OUT).as_posix()
         items.append({
-            "src": f"{web}/{name}.jpg",
-            "thumb": f"{web}/{name}.t.jpg",
+            "src": f"{web}/{name}.{ext}",
+            "thumb": f"{web}/{name}.t.{ext}",
             "w": full.width,
             "h": full.height,
-            "cap": caption(f.stem),
+            "alpha": alpha,
+            "cap": caps.get(f.name) or caps.get(f.stem) or caption(f.stem),
         })
-        print(f"{rel}: {im.width}x{im.height} > {full.width}x{full.height}")
+        print(f"{rel}: {im.width}x{im.height} > {full.width}x{full.height}{' (läbipaistev)' if alpha else ''}")
     return items
 
 
@@ -111,9 +137,10 @@ def main():
     if builds.is_dir():
         for d in sorted((p for p in builds.iterdir() if p.is_dir()), key=lambda p: natural_key(p.name)):
             groups.append((f"ehitused/{d.name}", d))
-    profile = ROOT / "img" / "profiil"
-    if profile.is_dir():
-        groups.append(("profiil", profile))
+    for single in ("profiil", "kaas"):  # profiilifoto ja kaanepilt
+        d = ROOT / "img" / single
+        if d.is_dir():
+            groups.append((single, d))
 
     manifest = {}
     for key, src_dir in groups:
