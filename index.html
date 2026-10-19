@@ -51,9 +51,9 @@
       </div>
     </div>
     <!-- Foto: lae pilt kausta img/profiil (failinimi ei loe), see ilmub ise. -->
-    <figure class="photo" data-folder="profiil">
+    <figure class="photo" data-folder="kaas" data-alt="Töölaud arvutikomponentidega">
       <div class="ph" aria-hidden="true">RA</div>
-      <figcaption><span>Roger-Romeo Arm</span><span>Tartu</span></figcaption>
+      <figcaption><span>Töölaud ja abiline</span><span>Tartu</span></figcaption>
     </figure>
   </div>
 </section>
@@ -79,7 +79,13 @@
       <h2>Minust<small>Kes ma olen ja kuhu tahan jõuda</small></h2>
     </div>
     <div class="sec-body about">
-      <p class="big">Arvutid on mind huvitanud lapsest saati. Kõige rohkem meeldib mulle see osa IT-st, mida saab <span>käega katsuda</span>: komponendid, kaablid, BIOS ja hetk, kui uus masin esimest korda käivitub.</p>
+      <div class="about-side">
+        <p class="big">Arvutid on mind huvitanud lapsest saati. Kõige rohkem meeldib mulle see osa IT-st, mida saab <span>käega katsuda</span>: komponendid, kaablid, BIOS ja hetk, kui uus masin esimest korda käivitub.</p>
+        <!-- Profiilifoto: lae pilt kausta img/profiil, see ilmub siia ise. -->
+        <figure class="portrait" data-folder="profiil" hidden>
+          <figcaption><span>Roger-Romeo Arm</span><span>ITS24</span></figcaption>
+        </figure>
+      </div>
       <div class="qa">
         <div>
           <h3>Kes ma olen?</h3>
@@ -520,6 +526,7 @@
         <!--
           PILDID: lae fotod kausta img/ehitused/<data-folder>, näiteks img/ehitused/pohiarvuti.
           Piltide arv ei ole piiratud, järjekord on failinimede järgi (01, 02, ...).
+          Pildiallkirjad: fail allkirjad.txt samas kaustas, igal real "failinimi = allkiri".
           UUE EHITUSE LISAMINE: kopeeri üks <article class="build">...</article> plokk,
           muuda data-folder uue kausta nimeks ning pealkiri ja osad.
         -->
@@ -533,7 +540,8 @@
             <p class="use">1080p 280 Hz võistlusmängud (CS2, Overwatch 2)</p>
             <table class="parts">
               <tr><th>CPU</th><td>AMD Ryzen 7 7800X3D</td></tr>
-              <tr><th>Emaplaat</th><td>Gigabyte Aorus B850M</td></tr>
+              <tr><th>Emaplaat</th><td>Gigabyte B850M Aorus Elite</td></tr>
+              <tr><th>Jahuti</th><td>Arctic vesijahutus (AIO)</td></tr>
               <tr><th>Mälu</th><td>Patriot Viper Venom 32 GB DDR5-6000 CL30</td></tr>
               <tr><th>GPU</th><td>AMD Radeon RX 9060 XT 8 GB</td></tr>
             </table>
@@ -561,6 +569,15 @@
             <p class="note">Väike korpus nõuab hoolikat jahuti ja kaablite valikut. Komplektis aktiveeritud Windows 11 Pro ja videokaardi tugi.</p>
           </div>
         </article>
+      </div>
+
+      <div class="more-builds">
+        <div class="mb-head">
+          <h3>Teised ehitused</h3>
+          <span class="label">Galerii / klõpsa suurendamiseks</span>
+        </div>
+        <!-- Lae pildid kausta img/ehitused/galerii, need ilmuvad siia ise. -->
+        <div class="grid-gallery" data-folder="galerii" data-alt="Arvutiehitus"></div>
       </div>
 
       <div class="paper" id="paber">

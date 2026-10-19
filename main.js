@@ -23,6 +23,7 @@ function lbShow(i) {
   const img = lb.querySelector('img');
   img.src = it.src;
   img.alt = it.alt || '';
+  lb.querySelector('.stage').classList.toggle('cut', !!it.cut);
   lb.querySelector('.cap').textContent = it.cap || '';
   lb.querySelector('.ctr').textContent = (lbIndex + 1) + ' / ' + lbItems.length;
   // järgmine ja eelmine ette laadida
@@ -77,24 +78,37 @@ function el(tag, attrs) {
   return e;
 }
 
-function renderProfile(list) {
-  const fig = document.querySelector('.photo[data-folder]');
-  if (!fig || !list || !list.length) return;
-  const img = el('img', { src: list[0].thumb, alt: 'Roger-Romeo Arm', width: list[0].w, height: list[0].h });
-  img.addEventListener('load', () => fig.classList.add('has-img'));
-  img.addEventListener('error', () => img.remove());
-  fig.prepend(img);
-}
-
-function renderGallery(box, list) {
-  if (!list || !list.length) return;
-  const name = box.dataset.alt || 'Arvutiehitus';
-  const items = list.map((p, i) => ({
+function toItems(list, name) {
+  return list.map((p, i) => ({
     src: p.src,
+    thumb: p.thumb,
+    cut: !!p.alpha,
     cap: p.cap || (name + ', pilt ' + (i + 1)),
     alt: p.cap ? name + ': ' + p.cap : name + ', pilt ' + (i + 1),
   }));
+}
 
+// Kaanepilt (hero) ja profiilifoto (Minust): esimene pilt kaustast
+function renderSingle(fig, list) {
+  if (!fig || !list || !list.length) return;
+  const name = fig.dataset.alt || 'Roger-Romeo Arm';
+  const items = toItems(list, name);
+  const img = el('img', { src: list[0].thumb, alt: items[0].alt, width: list[0].w, height: list[0].h });
+  img.addEventListener('load', () => fig.classList.add('has-img'));
+  img.addEventListener('error', () => img.remove());
+  fig.hidden = false;
+  fig.prepend(img);
+  fig.style.cursor = 'zoom-in';
+  fig.addEventListener('click', () => openLightbox(items, 0));
+}
+
+// Ehituse kaart: suur pilt + eelvaated
+function renderGallery(box, list) {
+  if (!list || !list.length) return;
+  const name = box.dataset.alt || 'Arvutiehitus';
+  const items = toItems(list, name);
+
+  box.classList.toggle('cut', items[0].cut);
   const cover = el('button', { type: 'button', class: 'cover', 'aria-label': name + ': ava pildid (' + list.length + ')' });
   const cimg = el('img', { src: list[0].thumb, alt: items[0].alt, loading: 'lazy', decoding: 'async' });
   cimg.addEventListener('load', () => box.classList.add('has-img'));
@@ -106,9 +120,10 @@ function renderGallery(box, list) {
     box.append(el('span', { class: 'count', text: list.length + ' pilti' }));
     const MAX = 6;
     const strip = el('div', { class: 'thumbs' });
-    const shown = list.length > MAX ? MAX : list.length;
+    const shown = Math.min(MAX, list.length);
     for (let i = 0; i < shown; i++) {
       const b = el('button', { type: 'button', 'aria-label': items[i].alt });
+      if (items[i].cut) b.classList.add('cut');
       b.append(el('img', { src: list[i].thumb, alt: '', loading: 'lazy', decoding: 'async' }));
       if (i === MAX - 1 && list.length > MAX) b.append(el('span', { class: 'more', text: '+' + (list.length - MAX + 1) }));
       b.addEventListener('click', () => openLightbox(items, i));
@@ -118,10 +133,29 @@ function renderGallery(box, list) {
   }
 }
 
+// Galerii ruudustik: iga pilt eraldi ruuduna koos allkirjaga
+function renderGrid(box, list) {
+  if (!list || !list.length) return;
+  const name = box.dataset.alt || 'Arvutiehitus';
+  const items = toItems(list, name);
+  items.forEach((it, i) => {
+    const t = el('button', { type: 'button', class: 'gtile' + (it.cut ? ' cut' : ''), 'aria-label': it.alt });
+    const fig = el('span', { class: 'gimg' });
+    fig.append(el('img', { src: it.thumb, alt: '', loading: 'lazy', decoding: 'async' }));
+    const cap = el('span', { class: 'gcap' });
+    cap.append(el('b', { text: String(i + 1).padStart(2, '0') }), document.createTextNode(list[i].cap || name));
+    t.append(fig, cap);
+    t.addEventListener('click', () => openLightbox(items, i));
+    box.append(t);
+  });
+}
+
 fetch('img/pildid.json', { cache: 'no-cache' })
   .then(r => (r.ok ? r.json() : {}))
   .catch(() => ({}))
   .then(m => {
-    renderProfile(m['profiil']);
+    renderSingle(document.querySelector('.photo[data-folder]'), m[document.querySelector('.photo[data-folder]')?.dataset.folder]);
+    renderSingle(document.querySelector('.portrait[data-folder]'), m['profiil']);
     document.querySelectorAll('.gallery[data-folder]').forEach(box => renderGallery(box, m['ehitused/' + box.dataset.folder]));
+    document.querySelectorAll('.grid-gallery[data-folder]').forEach(box => renderGrid(box, m['ehitused/' + box.dataset.folder]));
   });
