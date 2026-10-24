@@ -1,10 +1,10 @@
 # failinimi = pildiallkiri
-01-rgb.jpg = Mänguarvuti RGB-valgustusega
-02-valge-jahuti.webp = Mänguarvuti valge jahutiga
-03-be-quiet.webp = Mänguarvuti be quiet! jahutiga
-04-itx-alus.webp = Kompaktne arvuti, Mini-ITX
+01-rgb.jpg = AM4-mänguarvuti
+02-valge-jahuti.webp = AM4-mänguarvuti
+03-be-quiet.webp = AM4-mänguarvuti
+04-itx-alus.webp = LGA1700-arvuti, Mini-ITX
 05-a520m.webp = AM4-mänguarvuti
-06-be-quiet-fury.webp = Arvuti panoraamkorpuses
+06-be-quiet-fury.webp = AM5-arvuti ilma videokaardita
 07-tomahawk.jpg = AM4-mänguarvuti
 08-b450m.jpg = AM4-mänguarvuti
 09-asrock.jpg = AM4-mänguarvuti
