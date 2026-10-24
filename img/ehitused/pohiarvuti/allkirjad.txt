@@ -1,1 +1,1 @@
-01-pohiarvuti.webp = Gigabyte B850M Aorus Elite, Arctic vesijahutus, Gigabyte Radeon
+01-pohiarvuti.webp = AM5-mänguarvuti
