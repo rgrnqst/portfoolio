@@ -1,1 +1,1 @@
-01-tooruum.jpg = Abiline teostamas inventuuri
+01-tooruum.jpg = Abiline inventuuri teostamas
