@@ -1,1 +1,1 @@
-01-mitx.webp = Fractal korpus, ASRock emaplaat, Thermalright jahuti, G.Skill mälu (pildil EVGA GeForce RTX 2080)
+01-mitx.webp = AM4-mänguarvuti, Mini-ITX
