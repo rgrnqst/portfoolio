@@ -157,5 +157,6 @@ fetch('img/pildid.json', { cache: 'no-cache' })
     renderSingle(document.querySelector('.photo[data-folder]'), m[document.querySelector('.photo[data-folder]')?.dataset.folder]);
     renderSingle(document.querySelector('.portrait[data-folder]'), m['profiil']);
     document.querySelectorAll('.gallery[data-folder]').forEach(box => renderGallery(box, m['ehitused/' + box.dataset.folder]));
-    document.querySelectorAll('.grid-gallery[data-folder]').forEach(box => renderGrid(box, m['ehitused/' + box.dataset.folder]));
+    // Galerii võib koguda pilte mitmest kaustast: data-folder="kaust1 kaust2"
+    document.querySelectorAll('.grid-gallery[data-folder]').forEach(box => renderGrid(box, box.dataset.folder.split(/\s+/).flatMap(f => m['ehitused/' + f] || [])));
   });

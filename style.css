@@ -391,6 +391,7 @@ p { margin: 0 0 14px; }
 
 /* teiste ehituste galerii */
 .more-builds { margin-top: 44px; border: var(--b) solid var(--line); overflow: hidden; }
+.builds-intro + .more-builds { margin-top: 0; }
 .mb-head {
   display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 8px 20px;
   padding: 16px 22px; border-bottom: var(--b) solid var(--line); background: var(--panel);
